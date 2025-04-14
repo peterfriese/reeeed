@@ -128,6 +128,10 @@ img, iframe, object, video {
 pre {
     max-width: 100%;
     overflow-x: auto;
+    padding: 1rem;
+    border-radius: 8px;
+    background-color: \(bg2Light);
+    color: \(fg2Light);
 }
 
 table {
@@ -184,6 +188,10 @@ figcaption, cite {
         background-color: \(bgDark);
     }
     a:link { color: \(linkDark); }
+    pre {
+      background-color: \(bg2Dark);
+      color: \(fg2Dark);
+    }
 }
 
 #__footer {
