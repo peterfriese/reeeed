@@ -13,9 +13,16 @@ public struct ReeeederView: View {
     var url: URL
     var options: ReeeederViewOptions
 
+  public init(styledHtml: String, url: URL, title: String?, options: ReeeederViewOptions = .init()) {
+    self.url = url
+    self.options = options
+    self.status = .extractedContent(html: styledHtml, baseURL: url, title: title)
+  }
+
     public init(url: URL, options: ReeeederViewOptions = .init()) {
         self.url = url
         self.options = options
+        self.status = .fetching
     }
 
     // MARK: - Implementation
@@ -24,13 +31,14 @@ public struct ReeeederView: View {
         case failedToExtractContent
         case extractedContent(html: String, baseURL: URL, title: String?)
     }
-    @State private var status = Status.fetching
+    @State private var status: Status
     @State private var titleFromFallbackWebView: String?
 
     public var body: some View {
         Color(options.theme.background)
             .overlay(content)
-            .edgesIgnoringSafeArea(.all)
+      // TODO: control this from the outside
+      // .edgesIgnoringSafeArea(.all)
             .overlay(loader)
             .navigationTitle(title ?? url.hostWithoutWWW)
         #if os(iOS)
@@ -38,8 +46,10 @@ public struct ReeeederView: View {
         #endif
             .task {
                 do {
+                  if status == .fetching {
                     let result = try await Reeeed.fetchAndExtractContent(fromURL: url, theme: options.theme)
                     self.status = .extractedContent(html: result.styledHTML, baseURL: result.baseURL, title: result.title)
+                  }
                 } catch {
                     status = .failedToExtractContent
                 }
